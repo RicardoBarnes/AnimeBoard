@@ -29,6 +29,7 @@ export async function getUserPosts(userId: string, limit = 20) {
             title,
             body,
             created_at,
+            cover_image_url,
             profiles!posts_user_id_fkey (
                 username
             )

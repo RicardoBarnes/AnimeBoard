@@ -11,7 +11,9 @@ import { createClient } from '@/lib/supabase/server';
  */
 
 
-export async function searchImages(query: string) {
+const IMAGES_PAGE_SIZE = 60;
+
+export async function searchImages(query: string, page = 0) {
     const supabase = await createClient();
     const {
         data: { user },
@@ -26,7 +28,8 @@ export async function searchImages(query: string) {
         .select('*')
         .eq('uploader_id', user.id)
         .is('removed_at', null)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(page * IMAGES_PAGE_SIZE, page * IMAGES_PAGE_SIZE + IMAGES_PAGE_SIZE - 1);
 
     if (query) {
         queryBuilder = queryBuilder.or(
@@ -40,5 +43,5 @@ export async function searchImages(query: string) {
         return { error: error.message };
     }
 
-    return { data };
+    return { data, hasMore: (data?.length || 0) === IMAGES_PAGE_SIZE };
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { toggleVote } from '@/app/actions/votes';
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 
 interface VoteButtonsProps {
     postId: string;
@@ -14,6 +14,7 @@ export default function VoteButtons({ postId, initialCounts, initialUserVote }: 
     const [userVote, setUserVote] = useState<'agree' | 'disagree' | null>(initialUserVote);
     const [counts, setCounts] = useState(initialCounts);
     const [isPending, startTransition] = useTransition();
+    const [justStamped, setJustStamped] = useState<'agree' | 'disagree' | null>(null);
 
     // Sync state when server re-renders with fresh data (after revalidatePath)
     useEffect(() => {
@@ -43,6 +44,8 @@ export default function VoteButtons({ postId, initialCounts, initialUserVote }: 
             if (voteType === 'agree') newAgree++;
             else newDisagree++;
             setUserVote(voteType);
+            setJustStamped(voteType);
+            setTimeout(() => setJustStamped(null), 400);
         }
 
         setCounts({ agree_count: newAgree, disagree_count: newDisagree });
@@ -56,33 +59,46 @@ export default function VoteButtons({ postId, initialCounts, initialUserVote }: 
         });
     }
 
-    return (
-        <div className="flex items-center gap-3">
-            <button
-                onClick={() => handleVote('agree')}
-                disabled={isPending}
-                className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all transform active:scale-95 ${userVote === 'agree'
-                    ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105'
-                    : 'bg-primary/10 text-primary hover:bg-primary hover:text-white'
-                    }`}
-            >
-                <ThumbsUp className="w-5 h-5" />
-                <span>Agree</span>
-                <span className="ml-1 font-bold">{counts.agree_count}</span>
-            </button>
+    const total = counts.agree_count + counts.disagree_count;
+    const agreePct = total === 0 ? 50 : Math.round((counts.agree_count / total) * 100);
 
-            <button
-                onClick={() => handleVote('disagree')}
-                disabled={isPending}
-                className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all transform active:scale-95 ${userVote === 'disagree'
-                    ? 'bg-accent-red text-white shadow-lg shadow-accent-red/20 scale-105'
-                    : 'bg-accent-red/10 text-accent-red hover:bg-accent-red hover:text-white'
-                    }`}
-            >
-                <ThumbsDown className="w-5 h-5" />
-                <span>Disagree</span>
-                <span className="ml-1 font-bold">{counts.disagree_count}</span>
-            </button>
+    return (
+        <div className="flex flex-col gap-2">
+            {/* Verdict meter — the tally, not decoration */}
+            <div className="flex h-1.5 w-full max-w-[280px] rounded-full overflow-hidden bg-slate-200 dark:bg-slate-800">
+                <div className="bg-gold transition-all duration-500" style={{ width: `${agreePct}%` }} />
+                <div className="bg-disagree transition-all duration-500" style={{ width: `${100 - agreePct}%` }} />
+            </div>
+
+            <div className="flex items-center gap-3">
+                <button
+                    onClick={() => handleVote('agree')}
+                    disabled={isPending}
+                    aria-pressed={userVote === 'agree'}
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold transition-all transform active:scale-95 border-2 border-gold text-gold hover:bg-gold hover:text-ink data-[active=true]:bg-gold data-[active=true]:text-ink data-[active=true]:shadow-lg data-[active=true]:shadow-gold/25"
+                    data-active={userVote === 'agree'}
+                >
+                    <span className={`stamp w-6 h-6 ${justStamped === 'agree' ? 'stamp-animate' : ''}`}>
+                        <Check className="w-3.5 h-3.5" />
+                    </span>
+                    <span>Agree</span>
+                    <span className="font-mono text-sm opacity-80">{counts.agree_count}</span>
+                </button>
+
+                <button
+                    onClick={() => handleVote('disagree')}
+                    disabled={isPending}
+                    aria-pressed={userVote === 'disagree'}
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold transition-all transform active:scale-95 border-2 border-disagree text-disagree hover:bg-disagree hover:text-disagree-foreground data-[active=true]:bg-disagree data-[active=true]:text-disagree-foreground data-[active=true]:shadow-lg data-[active=true]:shadow-disagree/25"
+                    data-active={userVote === 'disagree'}
+                >
+                    <span className={`stamp w-6 h-6 ${justStamped === 'disagree' ? 'stamp-animate' : ''}`}>
+                        <X className="w-3.5 h-3.5" />
+                    </span>
+                    <span>Disagree</span>
+                    <span className="font-mono text-sm opacity-80">{counts.disagree_count}</span>
+                </button>
+            </div>
         </div>
     );
 }

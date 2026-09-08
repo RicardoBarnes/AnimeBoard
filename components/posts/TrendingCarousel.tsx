@@ -42,13 +42,13 @@ export default function TrendingCarousel({ posts }: TrendingCarouselProps) {
             <div className="flex gap-2 absolute -top-11 right-0 z-10">
                 <button
                     onClick={() => scroll('left')}
-                    className="p-1 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-white hover:bg-primary hover:text-white transition-colors"
+                    className="p-1 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-white hover:bg-primary hover:text-primary-foreground transition-colors"
                 >
                     <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
                     onClick={() => scroll('right')}
-                    className="p-1 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-white hover:bg-primary hover:text-white transition-colors"
+                    className="p-1 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-white hover:bg-primary hover:text-primary-foreground transition-colors"
                 >
                     <ChevronRight className="w-5 h-5" />
                 </button>
@@ -84,15 +84,15 @@ export default function TrendingCarousel({ posts }: TrendingCarouselProps) {
                         {/* Content */}
                         <div className="absolute bottom-4 left-4 right-4">
                             {index === 0 ? (
-                                <span className="bg-primary text-white text-[10px] font-bold uppercase px-2 py-1 rounded mb-2 inline-block">
-                                    Trending #1 · {post.totalVotes} votes
+                                <span className="inline-block border border-gold text-gold text-[10px] font-mono uppercase tracking-wider px-3 py-1 rounded-full mb-2 -rotate-2 bg-ink/60">
+                                    Top Verdict · {post.totalVotes}
                                 </span>
                             ) : (
-                                <span className="bg-slate-700 text-white text-[10px] font-bold uppercase px-2 py-1 rounded mb-2 inline-block">
-                                    #{index + 1} · {post.totalVotes} votes
+                                <span className="font-mono text-[10px] uppercase tracking-wider text-slate-300 bg-black/50 px-2 py-1 rounded mb-2 inline-block">
+                                    №{index + 1} · {post.totalVotes} {post.totalVotes === 1 ? 'verdict' : 'verdicts'}
                                 </span>
                             )}
-                            <h4 className="text-white text-xl font-bold line-clamp-2">{post.title}</h4>
+                            <h4 className="text-white font-display text-xl font-semibold line-clamp-2 mt-2">{post.title}</h4>
                             {(() => {
                                 const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
                                 const username = profile?.username;

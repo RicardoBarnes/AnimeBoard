@@ -29,7 +29,7 @@ export default function ImageSearch() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search by character or series name..."
-                    className="w-full px-4 py-3 pl-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                    className="w-full px-4 py-3 pl-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
                 />
                 <svg
                     className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"

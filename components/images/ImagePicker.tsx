@@ -1,7 +1,7 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { Database } from '@/lib/types/database.types';
 
@@ -19,6 +19,8 @@ interface ImagePickerProps {
     className?: string;
 }
 
+const PAGE_SIZE = 60;
+
 export default function ImagePicker({
     mode = 'single',
     onSelect,
@@ -27,18 +29,20 @@ export default function ImagePicker({
 }: ImagePickerProps) {
     const [images, setImages] = useState<ImageData[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(initialSelected));
 
-    // Fetch images with search
-    const fetchImages = useCallback(async (query: string) => {
-        setLoading(true);
+    // Fetch a page of images, optionally filtered by search query.
+    const fetchImages = useCallback(async (query: string, page: number) => {
         try {
             const supabase = createClient();
             const { data: { user } } = await supabase.auth.getUser();
 
             if (!user) {
                 setImages([]);
+                setHasMore(false);
                 return;
             }
 
@@ -47,7 +51,8 @@ export default function ImagePicker({
                 .select('*')
                 .eq('uploader_id', user.id)
                 .is('removed_at', null)
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false })
+                .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
 
             if (query.trim()) {
                 queryBuilder = queryBuilder.or(
@@ -58,28 +63,39 @@ export default function ImagePicker({
             const { data, error } = await queryBuilder;
 
             if (!error && data) {
-                setImages(data);
+                setImages((prev) => (page === 0 ? data : [...prev, ...data]));
+                setHasMore(data.length === PAGE_SIZE);
             }
         } catch (err) {
             console.error('Error fetching images:', err);
-        } finally {
-            setLoading(false);
         }
     }, []);
 
-    // Initial load
+    // Fetch immediately on mount; debounce only on subsequent search-query
+    // changes so typing doesn't fire an immediate query AND a debounced one.
+    const isFirstRun = useRef(true);
     useEffect(() => {
-        fetchImages(searchQuery);
-    }, [searchQuery, fetchImages]);
+        setLoading(true);
 
-    // Debounced search
-    useEffect(() => {
+        if (isFirstRun.current) {
+            isFirstRun.current = false;
+            fetchImages(searchQuery, 0).finally(() => setLoading(false));
+            return;
+        }
+
         const timer = setTimeout(() => {
-            fetchImages(searchQuery);
+            fetchImages(searchQuery, 0).finally(() => setLoading(false));
         }, 300);
 
         return () => clearTimeout(timer);
     }, [searchQuery, fetchImages]);
+
+    const loadMore = useCallback(() => {
+        if (loadingMore || !hasMore) return;
+        setLoadingMore(true);
+        const nextPage = Math.floor(images.length / PAGE_SIZE);
+        fetchImages(searchQuery, nextPage).finally(() => setLoadingMore(false));
+    }, [fetchImages, hasMore, images.length, loadingMore, searchQuery]);
 
     // Handle image selection
     const handleImageClick = (image: ImageData) => {
@@ -121,7 +137,7 @@ export default function ImagePicker({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by character, series, or tags..."
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
                 />
             </div>
 
@@ -147,8 +163,8 @@ export default function ImagePicker({
                             key={image.id}
                             onClick={() => handleImageClick(image)}
                             className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all group ${isSelected(image.id)
-                                    ? 'border-purple-500 ring-2 ring-purple-500 ring-offset-2 dark:ring-offset-gray-900'
-                                    : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700'
+                                    ? 'border-gold ring-2 ring-gold ring-offset-2 dark:ring-offset-gray-900'
+                                    : 'border-gray-200 dark:border-gray-700 hover:border-gold/50'
                                 }`}
                         >
                             <Image
@@ -161,7 +177,7 @@ export default function ImagePicker({
 
                             {/* Selection indicator */}
                             {isSelected(image.id) && (
-                                <div className="absolute top-2 right-2 bg-purple-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
+                                <div className="absolute top-2 right-2 bg-gold text-ink rounded-full w-6 h-6 flex items-center justify-center">
                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                     </svg>
@@ -191,10 +207,23 @@ export default function ImagePicker({
                 </div>
             )}
 
+            {!loading && hasMore && (
+                <div className="text-center">
+                    <button
+                        type="button"
+                        onClick={loadMore}
+                        disabled={loadingMore}
+                        className="px-4 py-2 text-sm font-medium text-gold hover:text-gold-dim disabled:opacity-50"
+                    >
+                        {loadingMore ? 'Loading…' : 'Load more'}
+                    </button>
+                </div>
+            )}
+
             {/* Selection info */}
             {selectedIds.size > 0 && (
-                <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-                    <p className="text-sm text-purple-700 dark:text-purple-300">
+                <div className="flex items-center justify-between p-3 bg-gold/10 rounded-lg border border-gold/30">
+                    <p className="text-sm text-gold">
                         {selectedIds.size} {selectedIds.size === 1 ? 'image' : 'images'} selected
                     </p>
                     {mode === 'multi' && (
@@ -203,7 +232,7 @@ export default function ImagePicker({
                                 setSelectedIds(new Set());
                                 onSelect([]);
                             }}
-                            className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200 font-medium"
+                            className="text-sm text-gold hover:text-gold-dim font-medium"
                         >
                             Clear selection
                         </button>

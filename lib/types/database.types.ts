@@ -105,6 +105,9 @@ export interface Database {
                     id: string;
                     user_id: string;
                     title: string;
+                    body: string | null;
+                    vote_count: number;
+                    cover_image_url: string | null;
                     created_at: string;
                     updated_at: string;
                     removed_at: string | null;
@@ -114,6 +117,9 @@ export interface Database {
                     id?: string;
                     user_id: string;
                     title: string;
+                    body?: string | null;
+                    vote_count?: number;
+                    cover_image_url?: string | null;
                     created_at?: string;
                     updated_at?: string;
                     removed_at?: string | null;
@@ -123,6 +129,9 @@ export interface Database {
                     id?: string;
                     user_id?: string;
                     title?: string;
+                    body?: string | null;
+                    vote_count?: number;
+                    cover_image_url?: string | null;
                     created_at?: string;
                     updated_at?: string;
                     removed_at?: string | null;

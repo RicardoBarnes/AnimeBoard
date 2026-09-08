@@ -56,7 +56,9 @@ export default function DeleteButton({ postId }: DeleteButtonProps) {
                             </button>
                         </div>
                         <p className="text-slate-600 dark:text-slate-400 mb-6">
-                            This can&apos;t be undone. The post and all its slides will be removed from the feed.
+                            This permanently deletes the case along with its votes and comments — it isn&apos;t
+                            just hidden, it&apos;s gone. Your uploaded images stay in your library since you may
+                            reuse them elsewhere. This can&apos;t be undone.
                         </p>
 
                         {error && (

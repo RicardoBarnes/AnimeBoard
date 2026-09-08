@@ -42,7 +42,7 @@ export async function signup(formData: FormData) {
 
     // Sign up with username in metadata
     // The database trigger will automatically create the profile
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -54,6 +54,13 @@ export async function signup(formData: FormData) {
 
     if (error) {
         return { error: error.message };
+    }
+
+    // If the project requires email confirmation, signUp() succeeds but
+    // returns no session — redirecting to /home would just bounce the user
+    // straight back to /login. Tell them to check their email instead.
+    if (!data.session) {
+        return { needsConfirmation: true };
     }
 
     revalidatePath('/', 'layout');

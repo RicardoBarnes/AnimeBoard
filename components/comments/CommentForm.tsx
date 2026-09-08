@@ -17,8 +17,8 @@ export default function CommentForm({ postId, voteSection, parentCommentId, onSu
     const [error, setError] = useState<string | null>(null);
 
     const isAgree = voteSection === 'agree';
-    const borderColor = isAgree ? 'border-primary/20 focus:border-primary' : 'border-accent-red/20 focus:border-accent-red';
-    const buttonColor = isAgree ? 'bg-primary' : 'bg-accent-red';
+    const borderColor = isAgree ? 'border-gold/20 focus:border-gold' : 'border-disagree/20 focus:border-disagree';
+    const buttonColor = isAgree ? 'bg-gold text-ink' : 'bg-disagree text-disagree-foreground';
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -56,13 +56,13 @@ export default function CommentForm({ postId, voteSection, parentCommentId, onSu
             />
 
             {error && (
-                <div className="text-sm text-accent-red mt-1">{error}</div>
+                <div className="text-sm text-disagree mt-1">{error}</div>
             )}
 
             <button
                 type="submit"
                 disabled={isSubmitting || !content.trim()}
-                className={`absolute bottom-3 right-3 ${buttonColor} text-white p-2 rounded-lg hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
+                className={`absolute bottom-3 right-3 ${buttonColor} p-2 rounded-lg hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
             >
                 <Send className="w-4 h-4" />
             </button>

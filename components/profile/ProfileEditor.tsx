@@ -79,7 +79,7 @@ export default function ProfileEditor({ initialBio, initialAvatarUrl }: ProfileE
                 throw new Error(result.error || 'Failed to update profile');
             }
 
-            setSuccess('Profile updated successfully!');
+            setSuccess('Membership file updated.');
             setSelectedFile(null);
         } catch (err: any) {
             setError(err.message || 'An error occurred');
@@ -95,12 +95,12 @@ export default function ProfileEditor({ initialBio, initialAvatarUrl }: ProfileE
         <div className="space-y-6">
             {/* Avatar Upload */}
             <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    Profile Picture
+                <label className="block text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
+                    Council Portrait
                 </label>
                 <div className="flex items-center gap-6">
                     {/* Avatar Preview */}
-                    <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                    <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 ring-2 ring-gold/30 flex items-center justify-center flex-shrink-0">
                         {avatarPreview ? (
                             <img
                                 src={avatarPreview}
@@ -108,7 +108,7 @@ export default function ProfileEditor({ initialBio, initialAvatarUrl }: ProfileE
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <Upload className="w-8 h-8 text-gray-400" />
+                            <Upload className="w-8 h-8 text-slate-400" />
                         )}
                     </div>
 
@@ -116,7 +116,7 @@ export default function ProfileEditor({ initialBio, initialAvatarUrl }: ProfileE
                     <div>
                         <label
                             htmlFor="avatar-upload"
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                            className="inline-flex items-center gap-2 px-4 py-2 border border-gold/40 text-gold rounded-lg cursor-pointer hover:bg-gold/10 transition-colors font-medium text-sm"
                         >
                             <Upload className="w-4 h-4" />
                             Choose Image
@@ -129,7 +129,7 @@ export default function ProfileEditor({ initialBio, initialAvatarUrl }: ProfileE
                             onChange={handleFileChange}
                             disabled={isUploading || isSaving}
                         />
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
                             JPG, PNG or WebP. Max 5MB.
                         </p>
                     </div>
@@ -140,9 +140,9 @@ export default function ProfileEditor({ initialBio, initialAvatarUrl }: ProfileE
             <div>
                 <label
                     htmlFor="bio"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    className="block text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2"
                 >
-                    Bio
+                    Statement of Character
                 </label>
                 <textarea
                     id="bio"
@@ -150,25 +150,25 @@ export default function ProfileEditor({ initialBio, initialAvatarUrl }: ProfileE
                     onChange={(e) => setBio(e.target.value)}
                     maxLength={bioMaxLength}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
-                    placeholder="Tell us about yourself..."
+                    className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent bg-white dark:bg-slate-800 dark:text-white resize-none"
+                    placeholder="Tell the council about yourself..."
                     disabled={isSaving}
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-right">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 text-right">
                     {bioLength} / {bioMaxLength}
                 </p>
             </div>
 
             {/* Error Message */}
             {error && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+                <div className="bg-disagree/10 border border-disagree/30 text-disagree px-4 py-3 rounded-lg text-sm">
                     {error}
                 </div>
             )}
 
             {/* Success Message */}
             {success && (
-                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 px-4 py-3 rounded-lg text-sm">
+                <div className="bg-gold/10 border border-gold/30 text-gold px-4 py-3 rounded-lg text-sm">
                     {success}
                 </div>
             )}
@@ -177,7 +177,7 @@ export default function ProfileEditor({ initialBio, initialAvatarUrl }: ProfileE
             <button
                 onClick={handleSave}
                 disabled={isSaving || isUploading}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="w-full bg-gold text-ink py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold/30 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
                 {isSaving ? (
                     <span className="flex items-center justify-center gap-2">

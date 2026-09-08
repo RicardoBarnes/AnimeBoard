@@ -80,7 +80,7 @@ export default function ImageGallery({ images }: ImageGalleryProps) {
                                     {image.tags.slice(0, 3).map((tag, idx) => (
                                         <span
                                             key={idx}
-                                            className="text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full"
+                                            className="text-xs px-2 py-1 bg-gold/10 text-gold rounded-full"
                                         >
                                             {tag}
                                         </span>

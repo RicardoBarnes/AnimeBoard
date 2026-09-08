@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function toggleVote(postId: string, voteType: 'agree' | 'disagree') {
     const supabase = await createClient();
@@ -11,6 +12,11 @@ export async function toggleVote(postId: string, voteType: 'agree' | 'disagree')
 
     if (!user) {
         return { error: 'Not authenticated' };
+    }
+
+    const rateLimit = await checkRateLimit(supabase, user.id, 'toggle_vote');
+    if (!rateLimit.allowed) {
+        return { error: rateLimit.error };
     }
 
     // Check for existing vote

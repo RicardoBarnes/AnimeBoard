@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function addComment(
     postId: string,
@@ -16,6 +17,11 @@ export async function addComment(
 
     if (!user) {
         return { error: 'Not authenticated' };
+    }
+
+    const rateLimit = await checkRateLimit(supabase, user.id, 'add_comment');
+    if (!rateLimit.allowed) {
+        return { error: rateLimit.error };
     }
 
     if (!content || content.length < 1 || content.length > 2000) {

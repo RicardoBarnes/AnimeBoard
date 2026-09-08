@@ -4,6 +4,53 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+const MAX_DIMENSION = 2000;
+const RESIZE_QUALITY = 0.85;
+
+// Downscale + re-encode client-side (free, no infra) so large originals
+// never hit storage/egress at full resolution. Falls back to the original
+// file if resizing isn't needed or the browser can't produce a smaller blob.
+async function resizeImageIfNeeded(file: File): Promise<File> {
+    let bitmap: ImageBitmap;
+    try {
+        bitmap = await createImageBitmap(file);
+    } catch {
+        return file;
+    }
+
+    const { width, height } = bitmap;
+
+    if (width <= MAX_DIMENSION && height <= MAX_DIMENSION) {
+        bitmap.close();
+        return file;
+    }
+
+    const scale = MAX_DIMENSION / Math.max(width, height);
+    const targetWidth = Math.round(width * scale);
+    const targetHeight = Math.round(height * scale);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+        bitmap.close();
+        return file;
+    }
+
+    ctx.drawImage(bitmap, 0, 0, targetWidth, targetHeight);
+    bitmap.close();
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, file.type, RESIZE_QUALITY)
+    );
+
+    if (!blob || blob.size >= file.size) return file;
+
+    return new File([blob], file.name, { type: file.type });
+}
+
 export default function ImageUploader() {
     const router = useRouter();
     const [uploading, setUploading] = useState(false);
@@ -29,9 +76,9 @@ export default function ImageUploader() {
                 throw new Error('No file provided');
             }
 
-            const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
             if (!validTypes.includes(file.type)) {
-                throw new Error('Invalid file type. Only JPEG, PNG, WEBP, and GIF are allowed.');
+                throw new Error('Invalid file type. Only JPEG, PNG, and WEBP are allowed.');
             }
 
             const maxSize = 50 * 1024 * 1024; // 50MB
@@ -39,10 +86,14 @@ export default function ImageUploader() {
                 throw new Error('File too large. Maximum size is 50MB.');
             }
 
-            // Extract image dimensions
+            // Downscale before upload so storage/egress never carry full-resolution
+            // originals for images that don't need them.
+            const uploadFile = await resizeImageIfNeeded(file);
+
+            // Extract image dimensions (from the file that will actually be uploaded)
             const { width, height } = await new Promise<{ width: number; height: number }>((resolve, reject) => {
                 const img = new Image();
-                const objectUrl = URL.createObjectURL(file);
+                const objectUrl = URL.createObjectURL(uploadFile);
 
                 img.onload = () => {
                     URL.revokeObjectURL(objectUrl);
@@ -73,8 +124,8 @@ export default function ImageUploader() {
             // Upload to storage
             const { error: uploadError } = await supabase.storage
                 .from('user-uploads')
-                .upload(filePath, file, {
-                    contentType: file.type,
+                .upload(filePath, uploadFile, {
+                    contentType: uploadFile.type,
                     upsert: false,
                 });
 
@@ -101,8 +152,8 @@ export default function ImageUploader() {
                 character_name: characterName,
                 series_name: seriesName,
                 tags: tags,
-                file_size_bytes: file.size,
-                mime_type: file.type,
+                file_size_bytes: uploadFile.size,
+                mime_type: uploadFile.type,
                 width: width,
                 height: height,
             });
@@ -156,13 +207,13 @@ export default function ImageUploader() {
                     <input
                         type="file"
                         name="file"
-                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        accept="image/jpeg,image/png,image/webp"
                         required
                         onChange={handleFileChange}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-50 file:text-purple-700 dark:file:bg-purple-900/20 dark:file:text-purple-400 hover:file:bg-purple-100 dark:hover:file:bg-purple-900/40 transition-all"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent dark:bg-gray-700 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gold/10 file:text-gold dark:file:bg-gold/10 dark:file:text-gold hover:file:bg-gold/20 dark:hover:file:bg-gold/20 transition-all"
                     />
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        Max size: 50MB. Formats: JPEG, PNG, WEBP, GIF
+                        Max size: 50MB. Formats: JPEG, PNG, WEBP. Large images are automatically resized.
                     </p>
                 </div>
 
@@ -184,7 +235,7 @@ export default function ImageUploader() {
                         <input
                             type="text"
                             name="character_name"
-                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
                             placeholder="e.g., Naruto Uzumaki"
                         />
                     </div>
@@ -196,7 +247,7 @@ export default function ImageUploader() {
                         <input
                             type="text"
                             name="series_name"
-                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
                             placeholder="e.g., Naruto"
                         />
                     </div>
@@ -209,7 +260,7 @@ export default function ImageUploader() {
                     <input
                         type="text"
                         name="tags"
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
                         placeholder="action, hero, ninja (comma-separated)"
                     />
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -218,21 +269,21 @@ export default function ImageUploader() {
                 </div>
 
                 {error && (
-                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+                    <div className="bg-disagree/10 border border-disagree/30 text-disagree px-4 py-3 rounded-lg text-sm">
                         {error}
                     </div>
                 )}
 
                 {success && (
-                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 px-4 py-3 rounded-lg text-sm">
-                        Image uploaded successfully!
+                    <div className="bg-gold/10 border border-gold/30 text-gold px-4 py-3 rounded-lg text-sm">
+                        Evidence filed successfully.
                     </div>
                 )}
 
                 <button
                     type="submit"
                     disabled={uploading}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    className="w-full bg-gold text-ink py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold/30 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                     {uploading ? 'Uploading...' : 'Upload Image'}
                 </button>

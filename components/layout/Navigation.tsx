@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import LogoutButton from '@/components/auth/LogoutButton';
 import AvatarFallback from '@/components/profile/AvatarFallback';
-import { Home, TrendingUp, PlusCircle } from 'lucide-react';
+import { Landmark, PlusCircle } from 'lucide-react';
 
 export default async function Navigation() {
     // Get current user and their profile
@@ -24,54 +24,47 @@ export default async function Navigation() {
     }
 
     return (
-        <header className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-4 md:px-10 py-4 sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-50">
-            <div className="flex items-center gap-8">
-                <Link href="/home" className="flex items-center gap-2 text-primary">
-                    <TrendingUp className="w-7 h-7" />
-                    <h2 className="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight">
-                        AnimeBoard
-                    </h2>
-                </Link>
-                <nav className="hidden md:flex items-center gap-6">
-                    <Link
-                        href="/home"
-                        className="text-primary text-sm font-bold leading-normal flex items-center gap-1.5"
-                    >
-                        <Home className="w-4 h-4" />
-                        Home
+        <header className="sticky top-0 z-50 border-b border-gold/20 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md">
+            <div className="flex items-center justify-between px-4 md:px-10 py-3.5">
+                <div className="flex items-center gap-8">
+                    <Link href="/home" className="flex items-center gap-2.5 text-gold">
+                        <Landmark className="w-6 h-6" strokeWidth={1.75} />
+                        <span className="font-display text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                            AnimeBoard
+                        </span>
                     </Link>
-                    <Link
-                        href="/home#trending"
-                        className="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors flex items-center gap-1.5"
-                    >
-                        <TrendingUp className="w-4 h-4" />
-                        Trending
-                    </Link>
-                    <Link
-                        href="/app/create"
-                        className="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors flex items-center gap-1.5"
-                    >
-                        <PlusCircle className="w-4 h-4" />
-                        Create
-                    </Link>
-                </nav>
+                    <nav className="hidden md:flex items-center gap-6">
+                        <Link
+                            href="/home"
+                            className="text-sm font-mono uppercase tracking-wider text-slate-900 dark:text-white font-medium flex items-center gap-1.5"
+                        >
+                            The Docket
+                        </Link>
+                        <Link
+                            href="/home#trending"
+                            className="text-sm font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-gold dark:hover:text-gold transition-colors flex items-center gap-1.5"
+                        >
+                            Landmark Cases
+                        </Link>
+                        <Link
+                            href="/app/create"
+                            className="text-sm font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-gold dark:hover:text-gold transition-colors flex items-center gap-1.5"
+                        >
+                            <PlusCircle className="w-3.5 h-3.5" />
+                            File a Case
+                        </Link>
+                    </nav>
+                </div>
+                <div className="flex items-center gap-3">
+                    {username && (
+                        <Link href={`/u/${username}`} className="ring-offset-2 ring-offset-background-light dark:ring-offset-background-dark hover:ring-2 hover:ring-gold/50 rounded-full transition-all">
+                            <AvatarFallback username={username} avatarUrl={avatarUrl} size="sm" />
+                        </Link>
+                    )}
+                    <LogoutButton />
+                </div>
             </div>
-            <div className="flex items-center gap-3">
-                {/* User Avatar */}
-                {username && (
-                    <Link
-                        href={`/u/${username}`}
-                        className="hover:ring-primary/50 transition-all"
-                    >
-                        <AvatarFallback
-                            username={username}
-                            avatarUrl={avatarUrl}
-                            size="sm"
-                        />
-                    </Link>
-                )}
-                <LogoutButton />
-            </div>
+            <div className="h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
         </header>
     );
 }

@@ -1,7 +1,7 @@
 import { getUserProfile, getUserPosts, getUserStats } from '@/app/actions/profiles';
-import { getFirstSlideImage } from '@/app/actions/posts';
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/supabase/server';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Navigation from '@/components/layout/Navigation';
 import AvatarFallback from '@/components/profile/AvatarFallback';
@@ -24,23 +24,18 @@ export default async function UserProfilePage({
     // Fetch user stats
     const { stats } = await getUserStats(profile.id);
 
-    // Fetch user's posts
+    // Fetch user's posts (cover_image_url is denormalized on the row already,
+    // no per-post image lookup needed)
     const { posts } = await getUserPosts(profile.id, 20);
 
     // Get current user to check if viewing own profile
-    const supabase = await createClient();
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
     const isOwnProfile = user?.id === profile.id;
 
-    // Get first slide image for each post
-    const postsWithImages = await Promise.all(
-        (posts || []).map(async (post: any) => {
-            const imageUrl = await getFirstSlideImage(post.id);
-            return { ...post, imageUrl };
-        })
-    );
+    const postsWithImages = (posts || []).map((post: any) => ({
+        ...post,
+        imageUrl: post.cover_image_url,
+    }));
 
     return (
         <>
@@ -80,7 +75,7 @@ export default async function UserProfilePage({
                                 {isOwnProfile && (
                                     <Link
                                         href="/app/profile"
-                                        className="inline-block mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-bold"
+                                        className="inline-block mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-bold"
                                     >
                                         Edit Profile
                                     </Link>
@@ -156,11 +151,13 @@ export default async function UserProfilePage({
                                         <div className="flex gap-4 p-4">
                                             {/* Thumbnail */}
                                             {post.imageUrl && (
-                                                <div className="w-24 h-24 flex-shrink-0">
-                                                    <img
+                                                <div className="relative w-24 h-24 flex-shrink-0">
+                                                    <Image
                                                         src={post.imageUrl}
                                                         alt=""
-                                                        className="w-full h-full object-cover rounded"
+                                                        fill
+                                                        className="object-cover rounded"
+                                                        sizes="96px"
                                                     />
                                                 </div>
                                             )}

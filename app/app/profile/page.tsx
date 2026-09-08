@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Navigation from '@/components/layout/Navigation';
 import ProfileEditor from '@/components/profile/ProfileEditor';
-import AvatarFallback from '@/components/profile/AvatarFallback';
+import DeleteAccountButton from '@/components/profile/DeleteAccountButton';
 
 export default async function ProfileEditPage() {
     // Check authentication
@@ -29,15 +29,18 @@ export default async function ProfileEditPage() {
     return (
         <>
             <Navigation />
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+            <div className="min-h-screen bg-background-light dark:bg-background-dark">
                 <main className="max-w-2xl mx-auto px-4 py-8">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-                        <div className="mb-6">
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                                Edit Profile
+                    <div className="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 shadow-lg p-8">
+                        <div className="mb-8">
+                            <p className="font-mono text-xs uppercase tracking-[0.2em] text-gold mb-2">
+                                Membership File
+                            </p>
+                            <h1 className="font-display text-3xl font-semibold text-slate-900 dark:text-white">
+                                {profile.username}
                             </h1>
-                            <p className="text-gray-600 dark:text-gray-400">
-                                Update your profile picture and bio
+                            <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">
+                                Update your standing before the council — picture and bio.
                             </p>
                         </div>
 
@@ -45,6 +48,8 @@ export default async function ProfileEditPage() {
                             initialBio={profile.bio || undefined}
                             initialAvatarUrl={profile.avatar_url || undefined}
                         />
+
+                        <DeleteAccountButton username={profile.username} />
                     </div>
                 </main>
             </div>

@@ -34,13 +34,13 @@ export default function ForgotPasswordPage() {
 
     if (showSuccess) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 p-4">
+            <div className="min-h-screen flex items-center justify-center bg-background-dark p-4 grain-surface">
                 <div className="w-full max-w-md">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+                    <div className="bg-background-light dark:bg-slate-900 rounded-xl border border-gold/20 shadow-2xl shadow-black/40 p-8">
                         <div className="text-center mb-6">
-                            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div className="w-16 h-16 bg-gold/10 border border-gold/30 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <svg
-                                    className="w-8 h-8 text-green-600 dark:text-green-400"
+                                    className="w-8 h-8 text-gold"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -53,20 +53,19 @@ export default function ForgotPasswordPage() {
                                     />
                                 </svg>
                             </div>
-                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                                Check Your Email
+                            <h1 className="font-display text-2xl font-semibold text-slate-900 dark:text-white mb-2">
+                                Check your email
                             </h1>
-                            <p className="text-gray-600 dark:text-gray-400">
-                                If an account exists with that email, we&apos;ve sent a password reset
-                                link.
+                            <p className="text-slate-600 dark:text-slate-400">
+                                If a record exists for that email, we&apos;ve sent a reset link.
                             </p>
                         </div>
 
                         <Link
                             href="/login"
-                            className="block w-full text-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-[1.02] transition-all"
+                            className="block w-full text-center px-6 py-3 bg-gold text-ink rounded-lg font-semibold hover:shadow-lg hover:shadow-gold/30 hover:scale-[1.02] transition-all"
                         >
-                            Back to Login
+                            Back to Sign In
                         </Link>
                     </div>
                 </div>
@@ -75,15 +74,15 @@ export default function ForgotPasswordPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-background-dark p-4 grain-surface">
             <div className="w-full max-w-md">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-                    <div className="text-center mb-8">
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                            Forgot Password
+                <div className="bg-background-light dark:bg-slate-900 rounded-xl border border-gold/20 shadow-2xl shadow-black/40 p-8">
+                    <div className="mb-8">
+                        <h1 className="font-display text-3xl font-semibold text-slate-900 dark:text-white">
+                            Forgot password
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-2">
-                            Enter your email to receive a password reset link
+                        <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">
+                            We&apos;ll send a reset link to restore your standing.
                         </p>
                     </div>
 
@@ -91,7 +90,7 @@ export default function ForgotPasswordPage() {
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                                className="block text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2"
                             >
                                 Email
                             </label>
@@ -102,14 +101,14 @@ export default function ForgotPasswordPage() {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                                className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent bg-white dark:bg-slate-800 text-slate-900 dark:text-white transition-all"
                                 placeholder="your@email.com"
                                 disabled={isSubmitting}
                             />
                         </div>
 
                         {error && (
-                            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+                            <div className="bg-disagree/10 border border-disagree/30 text-disagree px-4 py-3 rounded-lg text-sm">
                                 {error}
                             </div>
                         )}
@@ -117,7 +116,7 @@ export default function ForgotPasswordPage() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                            className="w-full bg-gold text-ink py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold/30 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         >
                             {isSubmitting ? (
                                 <span className="flex items-center justify-center gap-2">
@@ -130,12 +129,9 @@ export default function ForgotPasswordPage() {
                         </button>
                     </form>
 
-                    <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+                    <div className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
                         Remember your password?{' '}
-                        <Link
-                            href="/login"
-                            className="text-purple-600 dark:text-purple-400 font-semibold hover:underline"
-                        >
+                        <Link href="/login" className="text-gold font-semibold hover:underline">
                             Sign in
                         </Link>
                     </div>

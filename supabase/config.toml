@@ -1,0 +1,6 @@
+# Minimal config so the Supabase CLI can link to and manage migrations
+# against the existing hosted project (no local Docker Postgres needed).
+# See the migration-adoption steps in the project chat history for how to
+# safely start tracking the existing supabase/migrations/*.sql files with
+# `supabase link` + `supabase migration repair`.
+project_id = "qxgcujgyqwnpkcrifgjy"

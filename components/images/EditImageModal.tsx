@@ -130,7 +130,7 @@ export default function EditImageModal({ image, isOpen, onClose }: EditImageModa
                                 type="text"
                                 value={characterName}
                                 onChange={(e) => setCharacterName(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
                                 placeholder="e.g., Naruto Uzumaki"
                             />
                         </div>
@@ -143,7 +143,7 @@ export default function EditImageModal({ image, isOpen, onClose }: EditImageModa
                                 type="text"
                                 value={seriesName}
                                 onChange={(e) => setSeriesName(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
                                 placeholder="e.g., Naruto"
                             />
                         </div>
@@ -156,7 +156,7 @@ export default function EditImageModal({ image, isOpen, onClose }: EditImageModa
                                 type="text"
                                 value={tagsInput}
                                 onChange={(e) => setTagsInput(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
                                 placeholder="action, hero, ninja (comma-separated)"
                             />
                             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -187,7 +187,7 @@ export default function EditImageModal({ image, isOpen, onClose }: EditImageModa
                             <button
                                 type="submit"
                                 disabled={saving}
-                                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                className="flex-1 bg-gold text-ink py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold/30 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                             >
                                 {saving ? 'Saving...' : 'Save Changes'}
                             </button>

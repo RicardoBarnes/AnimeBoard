@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import CommentForm from './CommentForm';
 import AvatarFallback from '@/components/profile/AvatarFallback';
+import ReportButton from '@/components/reports/ReportButton';
 import { ThumbsUp, ThumbsDown, Reply } from 'lucide-react';
 
 interface Comment {
@@ -67,6 +68,7 @@ export default function CommentList({ postId, initialComments, voteSection }: Co
                         >
                             <Reply className="w-3.5 h-3.5" /> Reply
                         </button>
+                        <ReportButton reportType="comment" targetId={comment.id} label="" className="!text-slate-400" />
                     </div>
 
                     {showReplyForm === comment.id && (
@@ -102,6 +104,7 @@ export default function CommentList({ postId, initialComments, voteSection }: Co
                                         <p className="mt-1 text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
                                             {reply.content}
                                         </p>
+                                        <ReportButton reportType="comment" targetId={reply.id} label="" className="!text-slate-400 mt-1" />
                                     </div>
                                 </div>
                             ))}
