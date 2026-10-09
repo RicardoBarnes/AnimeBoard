@@ -38,6 +38,12 @@ export async function toggleVote(postId: string, voteType: 'agree' | 'disagree')
             if (error) {
                 return { error: error.message };
             }
+
+            // The vote-count trigger deliberately no-ops on DELETE (it can
+            // conflict with cascading deletes of the post/account itself),
+            // so decrement explicitly here — this is a direct, non-cascading
+            // delete, so it's always safe to do.
+            await supabase.rpc('decrement_post_vote_count', { p_post_id: postId });
         } else {
             // Different vote - update
             const { error } = await supabase
